@@ -124,10 +124,7 @@
           connection)))))
 
 (defun open-stream (host port)
-  (let ((stream (open-tcp-stream host port
-                                      :direction :io
-                                      :timeout 3
-                                      :element-type '(unsigned-byte 8))))
+  (let ((stream (socket-stream (socket-connect host port :element-type '(unsigned-byte 8)))))
     (unless stream
       (error 'mysql-error :message (format nil "cannot connect to ~a:~a" host port)))
     stream))
@@ -185,6 +182,18 @@
     (setf (mysqlcon-insert-id connection) insert-id))
   nil)
 
+(defun concat-string (str1 &optional str2)
+  (if str2
+      (concatenate 'string str1 str2)
+      str1))
+
+
+(defun string-append (&rest strings)
+  (format t "~a~%" strings)
+  (let ((res (mapcar #'(lambda (string) (concat-string string)) strings)))
+    (format t "~a~%" res)
+    (car res)))
+
 (defun append-query-strings (strings)
   "Appends query strings into one string; addes the #\Space character to
    each string before appending strings into one"
@@ -201,7 +210,7 @@
 (defun read-packet-header (stream)
   (let ((length 0)
         (number 0))
-    (setq length (+ (read-byte stream)
+    (setq length (+ (read-byte  stream)
                     (ash (read-byte stream) 8)
                     (ash (read-byte stream) 16)))
     (setq number (read-byte stream))
