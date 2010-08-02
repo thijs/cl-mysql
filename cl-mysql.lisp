@@ -7,7 +7,10 @@
 
 ;;; Copyright (c) 2009-2010, Art Obrezan
 ;;; All rights reserved.
-;;; 
+;;;
+;;; Modified for SBCL by Thijs Oppermann
+;;; Copyright (c) 2010, M.L. Oppermann
+;;;
 ;;; Redistribution and use in source and binary forms, with or without
 ;;; modification, are permitted provided that the following conditions are met:
 ;;; 1. Redistributions of source code must retain the above copyright
@@ -39,24 +42,14 @@
 ;;;   database - string (optional)
 ;;; mysql:disconnect connection
 ;;; mysql:query connection query-strings => list of results
-;;; mysql:get-last-insert-id connection  => number 
+;;; mysql:get-last-insert-id connection  => number
 ;;;
 ;;; Notes:
 ;;; On connection sets the utf-8 encoding to comunicate with the server.
 ;;; The query function returns column fields as text.
 
+(in-package #:cl-mysql)
 
-(in-package "CL-USER")
-
-(defpackage "MYSQL"
-  (:add-use-defaults t)
-  (:export connect
-           disconnect
-           query
-           get-last-insert-id))
-
-(in-package "MYSQL")
-(require "comm")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -131,7 +124,7 @@
           connection)))))
 
 (defun open-stream (host port)
-  (let ((stream (comm:open-tcp-stream host port
+  (let ((stream (open-tcp-stream host port
                                       :direction :io
                                       :timeout 3
                                       :element-type '(unsigned-byte 8))))
@@ -222,7 +215,7 @@
                               :element-type '(unsigned-byte 8)
                               :initial-element 0)))
       (read-sequence buffer stream)
-      buffer)))  
+      buffer)))
 
 (defun write-packet-header (length packet-number stream)
   (write-byte (logand #xff length) stream)
@@ -268,7 +261,7 @@
              (%to-list stage1-hash)))))
 
 ;;-
-        
+
 (defun parse-handshake-packet (buffer)
   (let* ((protocol-version (aref buffer 0))
          (pos (position 0 buffer)) ;;; end position of a c-line (zero)
@@ -372,7 +365,7 @@
 
 ;;-
 
-(defun format-error-message (packet) 
+(defun format-error-message (packet)
   (let* ((error-list (parse-error-packet packet))
          (number  (getf error-list :error))
          (message (getf error-list :message)))
@@ -409,10 +402,10 @@
   (external-format:encode-lisp-string str :utf-8))
 
 (defun latin1-to-string (buf &key (start 0) (end (length buf)))
-  (external-format:decode-external-string buf :latin-1 :start start :end end)) 
+  (external-format:decode-external-string buf :latin-1 :start start :end end))
 
 (defun utf8-to-string (buf &key (start 0) (end (length buf)))
-  (external-format:decode-external-string buf :utf-8 :start start :end end)) 
+  (external-format:decode-external-string buf :utf-8 :start start :end end))
 
 (defun put-int8-to-array (int array &key position)
   (setf (aref array position) (logand #xFF int)))
