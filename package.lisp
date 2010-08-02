@@ -5,7 +5,7 @@
 
 (defpackage #:cl-mysql
   (:nicknames #:mysql)
-  (:use :cl)
+  (:use :cl :babel)
   (:import-from :cl-mysql-asd :*mysql-version*)
   (:export #:connect
            #:disconnect

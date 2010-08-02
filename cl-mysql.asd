@@ -28,4 +28,5 @@
   :components ((:file "package")
                (:file "cl-mysql"))
   :depends-on (:usocket
+               :babel
                :cl-sha1))

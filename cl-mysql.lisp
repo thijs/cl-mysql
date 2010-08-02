@@ -393,19 +393,19 @@
                       +capabilities+)))
 
 (defun string-to-latin1 (str)
-  (external-format:encode-lisp-string str :latin-1))
+  (string-to-octets str :encoding :latin-1))
 
 (defun string-to-cstring (str)
   (concatenate 'vector (string-to-latin1 str) #(0)))
 
 (defun string-to-utf8 (str)
-  (external-format:encode-lisp-string str :utf-8))
+  (string-to-octets str :encoding :utf-8))
 
 (defun latin1-to-string (buf &key (start 0) (end (length buf)))
-  (external-format:decode-external-string buf :latin-1 :start start :end end))
+  (octets-to-string buf :encoding :latin-1 :start start :end end))
 
 (defun utf8-to-string (buf &key (start 0) (end (length buf)))
-  (external-format:decode-external-string buf :utf-8 :start start :end end))
+  (octets-to-string buf :encoding :utf-8 :start start :end end))
 
 (defun put-int8-to-array (int array &key position)
   (setf (aref array position) (logand #xFF int)))
