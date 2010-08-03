@@ -63,15 +63,21 @@
 
 (defstruct mysqlcon stream host port connection-id insert-id)
 
-(defconstant +max-packet-size+ (* 1024 1024))
+(defmacro define-constant (name value &optional doc)
+`(defconstant ,name (if (and (boundp ',name)
+                             (equal (symbol-value ',name) ,value))
+                        (symbol-value ',name) ,value)
+,@(when doc (list doc))))
 
-(defconstant +latin1-swedish-ci+ 8)
-(defconstant +utf8-general-ci+  33)
+(define-constant +max-packet-size+ (* 1024 1024))
 
-(defconstant +com-quit+ 1)
-(defconstant +com-query+ 3)
+(define-constant +latin1-swedish-ci+ 8)
+(define-constant +utf8-general-ci+  33)
 
-(defconstant +capabilities+
+(define-constant +com-quit+ 1)
+(define-constant +com-query+ 3)
+
+(define-constant +capabilities+
   `((:client-long-password     .      1)   ; new more secure passwords
     (:client-found-rows        .      2)   ; found instead of affected rows
     (:client-long-flag         .      4)   ; get all column flags
@@ -91,7 +97,7 @@
     (:client-multi-statements  .  65536)   ; enable/disable multi-stmt support
     (:client-multi-results     . 131072))) ; enable/disable multi-results
 
-(defconstant +client-capabilities+ '(:client-long-password
+(define-constant +client-capabilities+ '(:client-long-password
                                      :client-long-flag
                                      :client-protocol-41
                                      :client-secure-connection
