@@ -63,46 +63,6 @@
 
 (defstruct mysqlcon stream host port connection-id insert-id)
 
-(defmacro define-constant (name value &optional doc)
-`(defconstant ,name (if (and (boundp ',name)
-                             (equal (symbol-value ',name) ,value))
-                        (symbol-value ',name) ,value)
-,@(when doc (list doc))))
-
-(define-constant +max-packet-size+ (* 1024 1024))
-
-(define-constant +latin1-swedish-ci+ 8)
-(define-constant +utf8-general-ci+  33)
-
-(define-constant +com-quit+ 1)
-(define-constant +com-query+ 3)
-
-(define-constant +capabilities+
-  `((:client-long-password     .      1)   ; new more secure passwords
-    (:client-found-rows        .      2)   ; found instead of affected rows
-    (:client-long-flag         .      4)   ; get all column flags
-    (:client-connect-with-db   .      8)   ; one can specify db on connect
-    (:client-no-schema         .     16)   ; don't allow database.table.column
-    (:client-compress          .     32)   ; can use compression protocol
-    (:client-odbc              .     64)   ; odbc client
-    (:client-local-files       .    128)   ; can use LOAD DATA LOCAL
-    (:client-ignore-space      .    256)   ; ignore spaces before '('
-    (:client-protocol-41       .    512)   ; new 4.1 protocol
-    (:client-interactive       .   1024)   ; this is an interactive client
-    (:client-ssl               .   2048)   ; switch to SSL after handshake
-    (:client-ignore-sigpipe    .   4096)   ; ignore sigpipes
-    (:client-transactions      .   8192)   ; client knows about transactions
-    (:client-reserved          .  16384)   ; old flag for 4.1 protocol
-    (:client-secure-connection .  32768)   ; new 4.1 authentication
-    (:client-multi-statements  .  65536)   ; enable/disable multi-stmt support
-    (:client-multi-results     . 131072))) ; enable/disable multi-results
-
-(define-constant +client-capabilities+ '(:client-long-password
-                                     :client-long-flag
-                                     :client-protocol-41
-                                     :client-secure-connection
-                                     :client-ignore-space
-                                     :client-transactions))
 
 ;;-
 
@@ -188,17 +148,8 @@
     (setf (mysqlcon-insert-id connection) insert-id))
   nil)
 
-(defun concat-string (str1 &optional str2)
-  (if str2
-      (concatenate 'string str1 str2)
-      str1))
-
-
-(defun string-append (&rest strings)
-  (format t "~a~%" strings)
-  (let ((res (mapcar #'(lambda (string) (concat-string string)) strings)))
-    (format t "~a~%" res)
-    (car res)))
+(defmacro string-append (&body body)
+  `(concatenate 'string ,@body))
 
 (defun append-query-strings (strings)
   "Appends query strings into one string; addes the #\Space character to

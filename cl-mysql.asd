@@ -26,6 +26,7 @@
   :long-description "CL-MYSQL is a binary client to mysql"
   :serial t
   :components ((:file "package")
+               (:file "constants")
                (:file "cl-mysql"))
   :depends-on (:usocket
                :babel
