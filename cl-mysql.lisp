@@ -151,11 +151,21 @@
 (defmacro string-append (&body body)
   `(concatenate 'string ,@body))
 
+;; (defun join-string (sep &rest strings)
+;;   (let* ((last (last strings))
+;;         (start (mapcar #'(lambda (string) (string-append string sep)) (butlast strings)))
+;;          (tmp (append start last)))
+;;     (reduce #'(lambda (a b) (string-append a b))  tmp)))
+
+(defun join-string (sep &rest strings)
+  (reduce #'(lambda (a b) (string-append a b))
+          (append (mapcar #'(lambda (string) (string-append string sep))
+                          (butlast strings))
+                  (last strings))))
+
 (defun append-query-strings (strings)
-  "Appends query strings into one string; addes the #\Space character to
-   each string before appending strings into one"
-  (apply #'string-append
-         (mapcar #'(lambda (string) (string-append string " ")) strings)))
+  "Appends query strings into one string seperated by a #\Space character"
+  (car (join-string " " strings)))
 
 ;;-
 
